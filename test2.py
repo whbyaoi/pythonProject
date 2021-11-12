@@ -6,6 +6,10 @@ import openpyxl
 
 interval = 7
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36'
+}
+
 
 def get_json_content(url, waiting_time):
     """ return json content """
@@ -14,13 +18,15 @@ def get_json_content(url, waiting_time):
     import json
     try:
         time.sleep(waiting_time)
-        r = requests.get(url)
+        r = requests.get(url, headers=headers)
         json_content = json.loads(str(r.content, encoding="utf-8"))
         return json_content
     except:
         print('except occurred')
         print('url: {}'.format(url))
         print('next crawling interval: {}'.format(waiting_time + interval))
+        # print('content: {}'.format(r.content))
+        # print('traceback: {}'.format(traceback.format_exc()))
         return get_json_content(url, waiting_time + interval)
 
 
@@ -33,6 +39,7 @@ if __name__ == '__main__':
     # print(book2.sheetnames)
     sheet2 = book2.worksheets[6]
     count = 0
+
     for address in set([row[0].value for row in list(sheet.rows)[1:]]):
         if address:
             address_content = get_json_content('https://chain.api.btc.com/v3/address/' + address, interval)
